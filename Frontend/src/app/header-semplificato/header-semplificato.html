@@ -1,0 +1,100 @@
+<header class="app-header">
+  <nav>
+    <div class="menu-icon">
+      <span class="fa-solid fa-bars"></span>
+    </div>
+    
+    <a class="logo" routerLink="/home">
+  <img src="/assets/LOGO_TECH3.png" alt="Logo Real Tech" class="realtech-logo" /> Real Tech
+    </a>
+    
+    <div class="nav-items">
+      <li><a href="/home">Home</a></li>
+      <li class="signin" *ngIf="!user" (click)="$event.stopPropagation()">
+        <a class="nav-link" href="javascript:void(0)"
+           (click)="toggleSignInMenu($event)"
+           aria-haspopup="true"
+           [attr.aria-expanded]="showSignInMenu">
+          Sign in
+        </a>
+        <div class="signin-menu" [class.open]="showSignInMenu" (click)="$event.stopPropagation()">
+          <a routerLink="/login">Accedi</a>
+          <a routerLink="/registrazione">Registrati</a>
+        </div>
+      </li>
+
+      <li *ngIf="user"><a href="#" (click)="logout()">Logout</a></li>
+      <li><a routerLink="/about">About</a></li>
+      <li><a routerLink="/catalogo" (click)="pulisciParametriCatalogo()">Catalogo</a></li>
+      <li *ngIf="user && (user.ruolo === 'admin' || user.ruolo === 'owner')"><a routerLink="/admin">Area Admin</a></li>
+    </div>
+
+    <div class="search-icon-trigger" (click)="toggleSearchOverlay()" title="Cerca prodotti">
+      <i class="fa fa-search"></i>
+    </div>
+      <div class="nav-icons">
+      <a routerLink="/profilo" class="nav-icon" title="Profilo">
+        <i class="fa-solid fa-user"></i>
+      </a>
+      <a routerLink="/carrello" class="nav-icon" title="Carrello">
+        <i class="fa-solid fa-shopping-cart"></i>
+        <span *ngIf="carrelloCount > 0" class="cart-badge">{{ carrelloCount }}</span>
+      </a>
+      <a routerLink="/wishlist" class="nav-icon" title="Wishlist">
+        <i class="fa-solid fa-heart"></i>
+        <span *ngIf="wishlistCount > 0" class="cart-badge">{{ wishlistCount }}</span>
+      </a>
+    </div>
+  </nav>
+</header>
+
+<div class="search-overlay-fullscreen" *ngIf="showSearchOverlay" (click)="closeSearchOverlay()">
+  <div class="search-overlay-content" (click)="$event.stopPropagation()">
+    <div class="search-overlay-header">
+      <h2>Cerca prodotti</h2>
+  <!-- close button removed as requested; overlay can be closed by clicking outside -->
+    </div>
+    
+    <div class="search-input-container">
+      <form (ngSubmit)="searchProducts()">
+        <input 
+          #searchInput
+          type="search" 
+          class="search-input-expanded" 
+          placeholder="Cosa stai cercando?" 
+          [(ngModel)]="searchQuery"
+          name="searchQuery"
+          (input)="onSearchInput($event)"
+          (keypress)="onSearchKeyPress($event)"
+          autocomplete="off"
+          required>
+        <button type="submit" class="search-submit-btn">
+          <i class="fa-solid fa-search"></i>
+          Cerca
+        </button>
+      </form>
+    </div>
+
+    <div class="suggestions-section" *ngIf="showSuggestions">
+      <h3>Suggerimenti</h3>
+      <div class="suggestions-grid-expanded">
+        <div 
+          class="suggestion-card-expanded" 
+          *ngFor="let suggestion of searchSuggestions"
+          (click)="selectSuggestion(suggestion)">
+          <img 
+            [src]="suggestion.immagine_url" 
+            [alt]="suggestion.nome"
+            class="suggestion-image-expanded"
+            loading="lazy">
+          <div class="suggestion-info-expanded">
+            <h4 class="suggestion-name-expanded">{{ suggestion.nome }}</h4>
+            <p class="suggestion-brand-expanded">{{ suggestion.marchio }}</p>
+            <div class="suggestion-price-expanded">{{ suggestion.prezzo_scontato != null ? suggestion.prezzo_scontato : suggestion.prezzo }} €</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

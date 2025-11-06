@@ -34,6 +34,7 @@ export const routes = [
   { path: 'chi-siamo', component: ChiSiamo },
   { path: 'registrazione', component: Registrazione },
   { path: 'catalogo', component: Catalogo },
+  { path: 'catalogo/prodotto/:id', component: Catalogo },
   { path: 'login', component: Login },
   { path: 'profilo', component: Profilo, canActivate: [AuthGuard] },
   { path: 'admin', component: Admin, canActivate: [AuthGuard], data: { admin: true } },

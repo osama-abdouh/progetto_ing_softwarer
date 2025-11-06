@@ -39,7 +39,7 @@ export class Login
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.http.post<any>('http://localhost:3000/api/auth/login', this.loginForm.value)
+  this.http.post<any>('http://localhost:8080/api/auth/login', this.loginForm.value)
         .subscribe({
           next: (res: any) => {
            this.auth.login(res.token);

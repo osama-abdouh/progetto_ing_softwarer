@@ -9,7 +9,7 @@ export interface CouponResponse {
   totale_originale?: number;
   totale_scontato?: number;
 }
-const privateurl = 'http://localhost:3000/api';
+const privateurl = 'http://localhost:8080/api';
 @Injectable({ providedIn: 'root' })
 export class CouponService {
   constructor(private http: HttpClient) {}

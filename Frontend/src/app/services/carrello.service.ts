@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap, map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { JAVA_API } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CarrelloService {
-  private baseUrl = 'http://localhost:3000/api/carrello';
+  private baseUrl = `${JAVA_API}/carrello`;
   
   private carrelloSubject = new BehaviorSubject<any[]>(this.getCarrelloGuest());
   public carrello$ = this.carrelloSubject.asObservable();
@@ -26,11 +27,27 @@ export class CarrelloService {
     return user ? user.id : null;
   }
 
-  // qua permette solo utenti autenticati possono gestire il carrello
+  // Gestisce carrello per utenti autenticati e guest
   aggiungiAlCarrello(idProdotto: number, quantita: number): Observable<any> { //prepara la chiamata HTTP con i dati necessari
     const idUtente = this.getIdUtente(); //prende id utente da sopra 
+    
     if (!idUtente) {
-      throw new Error('Utente non autenticato. Effettua il login per aggiungere prodotti al carrello.');
+      // Utente guest: salva nel localStorage
+      return new Observable(observer => {
+        const carrelloGuest = this.getCarrelloGuest();
+        const prodottoEsistente = carrelloGuest.find((p: any) => p.id_prodotto === idProdotto);
+        
+        if (prodottoEsistente) {
+          prodottoEsistente.quantita += quantita;
+        } else {
+          carrelloGuest.push({ id_prodotto: idProdotto, quantita: quantita });
+        }
+        
+        this.setCarrelloGuest(carrelloGuest);
+        this.carrelloSubject.next(carrelloGuest); // Aggiorna il BehaviorSubject
+        observer.next({ success: true });
+        observer.complete();
+      });
     }
     
     return this.http.post(`${this.baseUrl}/aggiungi`, { //fa la chiamata al backend post con i dati necessari
@@ -42,14 +59,30 @@ export class CarrelloService {
     ); // chiama private caricaCarrello() per aggiornare il carrello locale
   }
 
-  // Aggiungi pacchetto al carrello (chiamata al backend)
+  // Aggiungi pacchetto al carrello (gestisce utenti autenticati e guest)
   aggiungiPacchettoAlCarrello(idPacchetto: number, quantita: number): Observable<any> {
     const idUtente = this.getIdUtente();
+    
     if (!idUtente) {
-      throw new Error('Utente non autenticato. Effettua il login per aggiungere pacchetti al carrello.');
+      // Utente guest: salva pacchetto nel localStorage
+      return new Observable(observer => {
+        const carrelloGuest = this.getCarrelloGuest();
+        const pacchettoEsistente = carrelloGuest.find((p: any) => p.id_pacchetto === idPacchetto);
+        
+        if (pacchettoEsistente) {
+          pacchettoEsistente.quantita += quantita;
+        } else {
+          carrelloGuest.push({ id_pacchetto: idPacchetto, quantita: quantita });
+        }
+        
+        this.setCarrelloGuest(carrelloGuest);
+        this.carrelloSubject.next(carrelloGuest); // Aggiorna il BehaviorSubject
+        observer.next({ success: true });
+        observer.complete();
+      });
     }
 
-    return this.http.post(`${this.baseUrl}/aggiungiPacchetto`, {
+    return this.http.post(`${this.baseUrl}/aggiungi-pacchetto`, {
       id_utente: idUtente,
       id_pacchetto: idPacchetto,
       quantita: quantita
@@ -113,12 +146,13 @@ export class CarrelloService {
     );
   }
 
-  //se non sei loggato → carrello vuoto, se sei loggato → carrello personale
+  //Carica carrello guest dal localStorage o carrello utente dal backend
   private caricaCarrello(): void {
     const idUtente = this.getIdUtente();
     if (!idUtente) {
-      // Se l'utente non è loggato, svuota il carrello
-      this.carrelloSubject.next([]);
+      // Se l'utente non è loggato, carica carrello guest dal localStorage
+      const carrelloGuest = this.getCarrelloGuest();
+      this.carrelloSubject.next(carrelloGuest);
       return;
     }
     

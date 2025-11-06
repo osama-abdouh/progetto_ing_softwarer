@@ -1,0 +1,443 @@
+{
+  "uuid": "f8a7b5c2-1234-5678-9abc-def012345678",
+  "lastMigration": 32,
+  "name": "RealTech E-commerce API",
+  "endpointPrefix": "",
+  "latency": 0,
+  "port": 8080,
+  "hostname": "",
+  "folders": [],
+  "routes": [
+    {
+      "uuid": "route-auth-login",
+      "type": "http",
+      "documentation": "Login utente",
+      "method": "post",
+      "endpoint": "api/auth/login",
+      "responses": [
+        {
+          "uuid": "response-auth-login-success",
+          "body": "{\n  \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcm5hbWUiOiJ0ZXN0dXNlciIsImlhdCI6MTUxNjIzOTAyMn0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\",\n  \"user\": {\n    \"id\": 1,\n    \"nome\": \"Mario\",\n    \"cognome\": \"Rossi\",\n    \"email\": \"mario.rossi@email.com\",\n    \"username\": \"testuser\",\n    \"ruolo\": \"utente\"\n  }\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-auth-register",
+      "type": "http",
+      "documentation": "Registrazione nuovo utente",
+      "method": "post",
+      "endpoint": "api/auth/register",
+      "responses": [
+        {
+          "uuid": "response-auth-register-success",
+          "body": "{\n  \"message\": \"Registrazione completata con successo\",\n  \"userId\": 123\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-catalogo-prodotti",
+      "type": "http",
+      "documentation": "Lista tutti i prodotti",
+      "method": "get",
+      "endpoint": "api/catalogo/prodotti",
+      "responses": [
+        {
+          "uuid": "response-catalogo-prodotti-success",
+          "body": "[\n  {\n    \"id_prodotto\": 1,\n    \"nome\": \"Laptop Dell XPS 15\",\n    \"descrizione\": \"Laptop professionale con schermo 15 pollici\",\n    \"prezzo\": 1299.99,\n    \"prezzo_scontato\": null,\n    \"quantita_disponibile\": 10,\n    \"categoria\": \"Laptop\",\n    \"marchio\": \"Dell\",\n    \"immagine\": \"laptop-dell-xps15.jpg\",\n    \"promo\": false,\n    \"bloccato\": false\n  },\n  {\n    \"id_prodotto\": 2,\n    \"nome\": \"Mouse Logitech MX Master 3\",\n    \"descrizione\": \"Mouse wireless ergonomico\",\n    \"prezzo\": 99.99,\n    \"prezzo_scontato\": 79.99,\n    \"quantita_disponibile\": 50,\n    \"categoria\": \"Periferiche\",\n    \"marchio\": \"Logitech\",\n    \"immagine\": \"mouse-logitech-mx3.jpg\",\n    \"promo\": true,\n    \"bloccato\": false\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-catalogo-prodotto-detail",
+      "type": "http",
+      "documentation": "Dettaglio prodotto per ID",
+      "method": "get",
+      "endpoint": "api/catalogo/prodotto/:id",
+      "responses": [
+        {
+          "uuid": "response-catalogo-prodotto-detail-success",
+          "body": "{\n  \"id_prodotto\": {{urlParam 'id'}},\n  \"nome\": \"Laptop Dell XPS 15\",\n  \"descrizione\": \"Laptop professionale con schermo 15 pollici, processore Intel i7, 16GB RAM, 512GB SSD\",\n  \"prezzo\": 1299.99,\n  \"prezzo_scontato\": null,\n  \"quantita_disponibile\": 10,\n  \"categoria\": \"Laptop\",\n  \"marchio\": \"Dell\",\n  \"immagine\": \"laptop-dell-xps15.jpg\",\n  \"promo\": false,\n  \"bloccato\": false\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-carrello-get",
+      "type": "http",
+      "documentation": "Ottieni carrello utente",
+      "method": "get",
+      "endpoint": "api/carrello",
+      "responses": [
+        {
+          "uuid": "response-carrello-get-success",
+          "body": "[\n  {\n    \"id_prodotto\": 1,\n    \"nome\": \"Laptop Dell XPS 15\",\n    \"prezzo\": 1299.99,\n    \"quantita\": 1,\n    \"immagine\": \"laptop-dell-xps15.jpg\"\n  },\n  {\n    \"id_prodotto\": 2,\n    \"nome\": \"Mouse Logitech MX Master 3\",\n    \"prezzo\": 79.99,\n    \"quantita\": 2,\n    \"immagine\": \"mouse-logitech-mx3.jpg\"\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "Authorization",
+              "value": "Bearer {{header 'Authorization'}}"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-carrello-add",
+      "type": "http",
+      "documentation": "Aggiungi prodotto al carrello",
+      "method": "post",
+      "endpoint": "api/carrello",
+      "responses": [
+        {
+          "uuid": "response-carrello-add-success",
+          "body": "{\n  \"message\": \"Prodotto aggiunto al carrello\",\n  \"quantita\": 1\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-wishlist-get",
+      "type": "http",
+      "documentation": "Ottieni wishlist utente",
+      "method": "get",
+      "endpoint": "api/wishlist",
+      "responses": [
+        {
+          "uuid": "response-wishlist-get-success",
+          "body": "[\n  {\n    \"id_prodotto\": 3,\n    \"nome\": \"Tastiera Meccanica Corsair K95\",\n    \"prezzo\": 199.99,\n    \"immagine\": \"tastiera-corsair-k95.jpg\",\n    \"disponibile\": true\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-orders-get",
+      "type": "http",
+      "documentation": "Ottieni ordini utente",
+      "method": "get",
+      "endpoint": "api/orders/user/:userId",
+      "responses": [
+        {
+          "uuid": "response-orders-get-success",
+          "body": "[\n  {\n    \"id\": 1,\n    \"data_ordine\": \"2025-11-01T10:30:00Z\",\n    \"stato\": \"Consegnato\",\n    \"totale\": 1379.98,\n    \"indirizzo_consegna\": \"Via Roma 123, Milano\",\n    \"metodo_pagamento\": \"Carta di Credito\"\n  },\n  {\n    \"id\": 2,\n    \"data_ordine\": \"2025-11-04T15:45:00Z\",\n    \"stato\": \"In Spedizione\",\n    \"totale\": 499.99,\n    \"indirizzo_consegna\": \"Via Verdi 45, Roma\",\n    \"metodo_pagamento\": \"PayPal\"\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-acquisti-checkout",
+      "type": "http",
+      "documentation": "Completa checkout e crea ordine",
+      "method": "post",
+      "endpoint": "api/acquisti/checkout",
+      "responses": [
+        {
+          "uuid": "response-acquisti-checkout-success",
+          "body": "{\n  \"message\": \"Ordine completato con successo\",\n  \"ordine_id\": 123,\n  \"totale\": 1379.98,\n  \"tracking_number\": \"RT-2025-00123\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    },
+    {
+      "uuid": "route-admin-products-load",
+      "type": "http",
+      "documentation": "Carica tutti i prodotti (Admin)",
+      "method": "get",
+      "endpoint": "api/products/load",
+      "responses": [
+        {
+          "uuid": "response-admin-products-success",
+          "body": "[\n  {\n    \"id_prodotto\": 1,\n    \"nome\": \"Laptop Dell XPS 15\",\n    \"prezzo\": 1299.99,\n    \"quantita_disponibile\": 10,\n    \"categoria\": \"Laptop\",\n    \"marchio\": \"Dell\",\n    \"in_vetrina\": false,\n    \"promo\": false,\n    \"bloccato\": false\n  }\n]",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id"
+        }
+      ],
+      "enabled": true,
+      "responseMode": null
+    }
+  ],
+  "rootChildren": [
+    {
+      "type": "route",
+      "uuid": "route-auth-login"
+    },
+    {
+      "type": "route",
+      "uuid": "route-auth-register"
+    },
+    {
+      "type": "route",
+      "uuid": "route-catalogo-prodotti"
+    },
+    {
+      "type": "route",
+      "uuid": "route-catalogo-prodotto-detail"
+    },
+    {
+      "type": "route",
+      "uuid": "route-carrello-get"
+    },
+    {
+      "type": "route",
+      "uuid": "route-carrello-add"
+    },
+    {
+      "type": "route",
+      "uuid": "route-wishlist-get"
+    },
+    {
+      "type": "route",
+      "uuid": "route-orders-get"
+    },
+    {
+      "type": "route",
+      "uuid": "route-acquisti-checkout"
+    },
+    {
+      "type": "route",
+      "uuid": "route-admin-products-load"
+    }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    },
+    {
+      "key": "Access-Control-Allow-Origin",
+      "value": "*"
+    },
+    {
+      "key": "Access-Control-Allow-Methods",
+      "value": "GET,POST,PUT,PATCH,DELETE,HEAD,OPTIONS"
+    },
+    {
+      "key": "Access-Control-Allow-Headers",
+      "value": "Content-Type,Authorization"
+    }
+  ],
+  "proxyReqHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "proxyResHeaders": [
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "data": [],
+  "callbacks": []
+}

@@ -99,22 +99,23 @@ router.get('/prodotti/categoria/:nome', async (req, res) => {   //Riceve il nome
 // Prodotti più acquistati (top 3) — aggrega la tabella `acquisti`
 router.get('/popular', async (req, res) => {
   try {
-    // prende i prodotti più acquistati (somma delle quantità)
+    // Aggrega i prodotti più acquistati dalle righe d'ordine
     const result = await pool.query(`
-    SELECT 
-      p.id_prodotto,
-      p.nome,
-      CASE WHEN p.promo = TRUE AND p.prezzo_scontato IS NOT NULL THEN p.prezzo_scontato ELSE p.prezzo END AS prezzo,
-      p.descrizione,
-      p.immagine,
-      p.quantita_disponibile,
-      COALESCE(SUM(op.quantita), 0) AS total_purchased
-    FROM prodotto p
-    LEFT JOIN ordine_prodotti op ON p.id_prodotto = op.prodotto_id
-    WHERE p.quantita_disponibile > 0 AND p.bloccato = false
-    GROUP BY p.id_prodotto, p.nome, p.prezzo, p.prezzo_scontato, p.descrizione, p.immagine, p.quantita_disponibile, p.promo
-    ORDER BY total_purchased DESC, p.nome
-    LIMIT 3;
+      SELECT 
+        p.id_prodotto, 
+        p.nome, 
+        CASE WHEN p.promo = TRUE AND p.prezzo_scontato IS NOT NULL THEN p.prezzo_scontato ELSE p.prezzo END AS prezzo,
+        p.prezzo_scontato,
+        p.descrizione, 
+        p.immagine, 
+        p.quantita_disponibile,
+        COALESCE(SUM(op.quantita), 0) AS total_purchased
+      FROM prodotto p
+      LEFT JOIN ordine_prodotti op ON op.prodotto_id = p.id_prodotto
+      WHERE p.quantita_disponibile > 0 AND p.bloccato = false
+      GROUP BY p.id_prodotto, p.nome, p.prezzo, p.prezzo_scontato, p.promo, p.descrizione, p.immagine, p.quantita_disponibile
+      ORDER BY total_purchased DESC, p.nome
+      LIMIT 3
     `);
 
     const prodottiPopular = result.rows.map(prodotto => ({
@@ -146,7 +147,7 @@ router.get('/brand', async (req, res) => {
 // Endpoint per suggerimenti di ricerca
 router.get('/search/suggestions', async (req, res) => {
   try {
-    const { q, limit } = req.query;
+    const { q, limit = 5 } = req.query;
     
     if (!q || q.trim().length < 1) {
       return res.json([]);
@@ -159,6 +160,7 @@ router.get('/search/suggestions', async (req, res) => {
     p.id_prodotto, 
     p.nome, 
   CASE WHEN p.promo = TRUE AND p.prezzo_scontato IS NOT NULL THEN p.prezzo_scontato ELSE p.prezzo END AS prezzo,
+  p.prezzo_scontato,
         p.immagine,
         m.nome AS marchio,
         c.nome AS categoria

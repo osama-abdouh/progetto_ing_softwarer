@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class Admin implements OnInit {
 
-  private baseUrl = 'http://localhost:3000/api';
+  private baseUrl = 'http://localhost:8080/api';
   users: any[] = [];
   queryUtente: string = '';
   prodottoForm: any = {};
@@ -244,7 +244,8 @@ resetFormCoupon() {
     data_inizio: '',
     data_scadenza: '',
     usi_massimi: 1,
-    attivo: true
+    attivo: true,
+    uso_singolo: false
   };
 }
 
@@ -273,8 +274,14 @@ salvaCoupon() {
     return;
   }
   
-  // Validazione date
-  if (this.couponForm.data_scadenza <= this.couponForm.data_inizio) {
+  // Validazione date (confronto reale su oggetti Date)
+  const dInizio = new Date(this.couponForm.data_inizio);
+  const dFine = new Date(this.couponForm.data_scadenza);
+  if (isNaN(dInizio.getTime()) || isNaN(dFine.getTime())) {
+    alert('⚠️ Formato data non valido (usa AAAA-MM-GG)');
+    return;
+  }
+  if (dFine.getTime() <= dInizio.getTime()) {
     alert('⚠️ La data di scadenza deve essere successiva alla data di inizio');
     return;
   }
@@ -289,8 +296,12 @@ salvaCoupon() {
         this.chiudiFormCoupon();
       },
       error: (err) => {
-        console.error('Errore completo:', err);
-        alert(`❌ Errore: ${err.error?.error || err.message || 'Errore sconosciuto'}`);
+        if (err.status === 409 && err.error?.exists) {
+          alert('❌ Errore: codice coupon già esistente. Scegli un codice diverso.');
+        } else {
+          console.error('Errore completo:', err);
+          alert(`❌ Errore: ${err.error?.error || err.message || 'Errore sconosciuto'}`);
+        }
       }
     });
   } else {
@@ -311,7 +322,20 @@ salvaCoupon() {
           
           if (conferma) {
             // Carica i dati del coupon esistente nel form
-            this.couponForm = { ...err.error.coupon };
+            const toYMD = (val: any) => {
+              if (!val) return '';
+              const d = new Date(val);
+              if (isNaN(d.getTime())) return '';
+              const yyyy = d.getFullYear();
+              const mm = String(d.getMonth() + 1).padStart(2, '0');
+              const dd = String(d.getDate()).padStart(2, '0');
+              return `${yyyy}-${mm}-${dd}`;
+            };
+            this.couponForm = {
+              ...err.error.coupon,
+              data_inizio: toYMD(err.error.coupon.data_inizio),
+              data_scadenza: toYMD(err.error.coupon.data_scadenza)
+            };
             alert('✏️ Puoi ora modificare il coupon esistente');
             // Scroll al form
             document.getElementById('form-coupon')?.scrollIntoView({ behavior: 'smooth' });
@@ -326,7 +350,22 @@ salvaCoupon() {
 }
 
 modificaCoupon(coupon: any) {
-  this.couponForm = { ...coupon };
+  // Normalizza le date in formato AAAA-MM-GG per gli input type="date"
+  const toYMD = (val: any) => {
+    if (!val) return '';
+    const d = new Date(val);
+    if (isNaN(d.getTime())) return '';
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  this.couponForm = {
+    ...coupon,
+    data_inizio: toYMD(coupon.data_inizio),
+    data_scadenza: toYMD(coupon.data_scadenza)
+  };
   this.mostraFormCoupon = true;
   document.getElementById('form-coupon')?.scrollIntoView({ behavior: 'smooth' });
 }

@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
-import { Router } from '@angular/router'; 
+import { WishListService } from './wishlist.service';
+import { JAVA_API } from '../config/api.config';
 @Injectable({ providedIn: 'root' })
 export class CatalogoService {
-  private apiUrl = 'http://localhost:3000/api/catalogo';
+  private apiUrl = `${JAVA_API}/catalogo`;
 
-  constructor(private http: HttpClient, private authService: AuthService, private router: Router) {}
+  constructor(private http: HttpClient, private authService: AuthService, private wishlistService: WishListService) {}
 
   // Ottieni prodotti più acquistati (per la home)
   getProdottiPopular(): Observable<any[]> {
@@ -24,7 +25,7 @@ export class CatalogoService {
     return this.http.get<any[]>(`${this.apiUrl}/prodotti/categoria/${nomeCategoria}`);
   }
 
-  // Ottieni tutti i brand
+  // Ottieni tutti i marchi
   getBrand(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/brand`);
   }
@@ -48,40 +49,23 @@ private getIdUtente(): number | null {
     const user = this.authService.getUser();  //chiama getUser di authService
     return user ? user.id : null;
   }
-
-  controllaWishlist(prodotto: any): Observable<boolean> {
-  const idUtente = this.getIdUtente();
-  if (!idUtente) return new Observable(observer => observer.next(false));
-  return this.http.get<{ presente: boolean }>(
-    `http://localhost:3000/api/wishlist/check/${idUtente}/${prodotto.id_prodotto}`
-  ).pipe(
-    map(res => res.presente)
-  );
-}
   
- aggiungiAWishlist(prodotto: any): void {
+  aggiungiAWishlist(prodotto: any): void {
   const idUtente = this.getIdUtente();
   if (!idUtente) {
-    alert('Devi essere loggato per aggiungere prodotti alla wishlist!');
-    this.router.navigate(['/login']);
+    alert('Devi essere autenticato per aggiungere alla wishlist!');
     return;
   }
-  this.controllaWishlist(prodotto).subscribe(presente => {
-    if (presente) {
-      alert('Prodotto già presente nella wishlist!');
-    } else {
-      this.http.post('http://localhost:3000/api/wishlist', {
-        user_id: idUtente,
-        prodotto_id: prodotto.id_prodotto
-      }).subscribe({
-        next: () => {
-          alert('Prodotto aggiunto alla wishlist!');
-        },
-        error: (err) => {
-          console.error('Errore wishlist:', err);
-          alert('Errore nell\'aggiungere il prodotto alla wishlist');
-        }
-      });
+  this.http.post(`${JAVA_API}/wishlist`, {
+    prodotto_id: prodotto.id_prodotto
+  }).subscribe({
+    next: () => {
+      alert('Prodotto aggiunto alla wishlist!');
+      this.wishlistService.refreshCount();
+    },
+    error: (err) => {
+      console.error('Errore wishlist:', err);
+      alert('Errore nell\'aggiungere il prodotto alla wishlist');
     }
   });
 }

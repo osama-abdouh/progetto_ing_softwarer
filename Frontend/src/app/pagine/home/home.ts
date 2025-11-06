@@ -41,7 +41,17 @@ export class Home implements OnInit {
     this.user = this.auth.getUser();
   }
   vaiAlDettaglioProdotto(prodotto: any) {
-    this.router.navigate(['/catalogo'], { queryParams: { prodottoId: prodotto.id_prodotto } });
+    // Support multiple possible id field names from different endpoints
+    const rawId = prodotto?.id_prodotto ?? prodotto?.id ?? prodotto?.prodotto_id;
+    const idNum = Number(rawId);
+    if (!rawId || !Number.isFinite(idNum)) {
+      console.warn('Impossibile determinare l\'ID del prodotto per la navigazione:', prodotto);
+      // Fallback: apri il catalogo senza dettaglio specifico
+      this.router.navigate(['/catalogo']);
+      return;
+    }
+    // Prefer the explicit detail route; Catalogo component supports both path and query param
+    this.router.navigate(['/catalogo/prodotto', idNum]);
   }
 
   vaiANovita(articolo: string) {

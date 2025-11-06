@@ -3,12 +3,12 @@
 
   <!-- Carrello guest -->
   <ng-container *ngIf="!auth.isLoggedIn()">
-    <div *ngIf="carrelloGuest.length === 0" class="carrello-vuoto"> <!-- se carrello è vuoto -->
+    <div *ngIf="carrelloGuest.length === 0" class="carrello-vuoto">
       <p class="carrello-text">Il carrello è vuoto</p>
       <a href="/catalogo">Continua gli acquisti</a>
     </div>
     <div *ngFor="let item of carrelloGuest; trackBy: trackByItem" class="carrello-item">
-      <img [src]="item.immagine_url || 'http://localhost:3000/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
+  <img [src]="item.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
       <div class="item-details">
         <h4 class="carrello-text">{{ item.nome }}</h4>
         <p class="carrello-text">Prezzo: {{ item.prezzo_scontato != null ? item.prezzo_scontato : item.prezzo }}€</p>
@@ -32,18 +32,18 @@
 
   <!-- Carrello utente loggato -->
   <ng-container *ngIf="auth.isLoggedIn()">
-    <ng-container *ngIf="carrello$ | async as carrello"> 
-      <div *ngIf="carrello.length === 0" class="carrello-vuoto"> <!-- se carrello è vuoto -->
+    <ng-container *ngIf="carrello$ | async as carrello">
+      <div *ngIf="carrello.length === 0" class="carrello-vuoto">
         <p class="carrello-text">Il carrello è vuoto</p>
         <a href="/catalogo">Continua gli acquisti</a>
       </div>
-      <div *ngFor="let item of carrello; trackBy: trackByItem" class="carrello-item"> <!--trackByItem (definita nel componente) per identificare in modo univoco ogni prodotto, così quando il carrello cambia, aggiorna solo gli elementi modificati invece di ridisegnare tutto.-->
-        <img [src]="item.immagine_url || 'http://localhost:3000/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
+      <div *ngFor="let item of carrello; trackBy: trackByItem" class="carrello-item">
+  <img [src]="item.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
         <div class="item-details">
           <h4 class="carrello-text">{{ item.nome }}</h4>
           <p class="carrello-text">Prezzo: {{ item.prezzo_scontato != null ? item.prezzo_scontato : item.prezzo }}€</p>
           <div class="quantity-control">
-            <label class="carrello-label">Quantità: </label> <!-- Etichetta per il campo quantità (per aggiungere quantità) -->
+            <label class="carrello-label">Quantità: </label>
             <input type="number"
                    [value]="item.quantita"
                    min="1"

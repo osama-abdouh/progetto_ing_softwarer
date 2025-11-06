@@ -2,7 +2,8 @@
   "scripts": {
     "start": "npm --prefix Frontend run start",
     "start:frontend": "npm --prefix Frontend run start",
-    "start:backend": "npm --prefix Backend run start"
+    "start:backend": "npm --prefix Backend run start",
+    "start:backend-java": "cd BackendJava && gradlew.bat bootRun"
   },
   "dependencies": {
     "dotenv": "^17.2.3",

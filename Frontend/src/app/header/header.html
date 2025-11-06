@@ -19,39 +19,34 @@
         </a>
         <div class="signin-menu" [class.open]="showSignInMenu" (click)="$event.stopPropagation()">
           <a routerLink="/login">Accedi</a>
-          <a routerLink="/registrazione">Registrati</a>
+          <a routerLink="/registrazione">Registrati</a> 
         </div>
       </li>
 
+      <li *ngIf="user"><a routerLink="/profilo">Profilo</a></li>
       <li *ngIf="user"><a href="#" (click)="logout()">Logout</a></li>
       <li><a routerLink="/about">About</a></li>
       <li><a routerLink="/catalogo" (click)="pulisciParametriCatalogo()">Catalogo</a></li>
+      <li><a routerLink="/carrello">Carrello</a></li>
       <li *ngIf="user && (user.ruolo === 'admin' || user.ruolo === 'owner')"><a routerLink="/admin">Area Admin</a></li>
     </div>
 
+    <!-- Icona di ricerca in alto a destra -->
     <div class="search-icon-trigger" (click)="toggleSearchOverlay()" title="Cerca prodotti">
-      <i class="fa fa-search"></i>
-    </div>
-      <div class="nav-icons">
-      <a routerLink="/profilo" class="nav-icon" title="Profilo">
-        <i class="fa-solid fa-user"></i>
-      </a>
-      <a routerLink="/carrello" class="nav-icon" title="Carrello">
-        <i class="fa-solid fa-shopping-cart"></i>
-        <span *ngIf="carrelloCount > 0" class="cart-badge">{{ carrelloCount }}</span>
-      </a>
-      <a routerLink="/wishlist" class="nav-icon" title="Wishlist">
-        <i class="fa-solid fa-heart"></i>
-      </a>
+      <i class="fa-solid fa-search"></i>
+        <span>🔍</span>
     </div>
   </nav>
 </header>
 
-<div class="search-overlay-fullscreen" *ngIf="showSearchOverlay" (click)="showSearchOverlay = false">
+<!-- Overlay full-screen per la ricerca -->
+<div class="search-overlay-fullscreen" *ngIf="showSearchOverlay" (click)="closeSearchOverlay()">
   <div class="search-overlay-content" (click)="$event.stopPropagation()">
     <div class="search-overlay-header">
       <h2>Cerca prodotti</h2>
-  <!-- close button removed as requested; overlay can be closed by clicking outside -->
+      <button class="close-search-btn" (click)="closeSearchOverlay()">
+        <i class="fa-solid fa-times"></i>
+      </button>
     </div>
     
     <div class="search-input-container">
@@ -74,6 +69,7 @@
       </form>
     </div>
 
+    <!-- Suggerimenti in layout grid -->
     <div class="suggestions-section" *ngIf="showSuggestions">
       <h3>Suggerimenti</h3>
       <div class="suggestions-grid-expanded">
@@ -85,15 +81,15 @@
             [src]="suggestion.immagine_url" 
             [alt]="suggestion.nome"
             class="suggestion-image-expanded"
-            loading="lazy">
+            loading="lazy"
+            onerror="this.src='http://localhost:8080/api/images/prodotti/default.jpg'">
           <div class="suggestion-info-expanded">
             <h4 class="suggestion-name-expanded">{{ suggestion.nome }}</h4>
             <p class="suggestion-brand-expanded">{{ suggestion.marchio }}</p>
-            <div class="suggestion-price-expanded">{{ suggestion.prezzo_scontato != null ? suggestion.prezzo_scontato : suggestion.prezzo }} €</div>
+            <div class="suggestion-price-expanded">€{{ suggestion.prezzo_scontato != null ? suggestion.prezzo_scontato : suggestion.prezzo }}</div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-

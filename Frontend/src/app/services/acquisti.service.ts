@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { JAVA_API } from '../config/api.config';
 
 export interface DatiCheckout {
   metodo_pagamento: string;
@@ -22,7 +23,7 @@ export interface RisultatoAcquisto {
   providedIn: 'root'
 })
 export class AcquistiService {
-  private baseUrl = 'http://localhost:3000/api/acquisti';
+  private baseUrl = 'http://localhost:8080/api/acquisti';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
@@ -46,7 +47,8 @@ export class AcquistiService {
 
     console.log('Dati inviati al backend:', datiCompleti); // Per debug
     
-    return this.http.post<any>(`${this.baseUrl}/checkout`, datiCompleti);
+  // Checkout now goes to Java backend
+  return this.http.post<any>(`${JAVA_API}/acquisti/checkout`, datiCompleti);
   }
 
   // Ottieni storico acquisti dell'utente

@@ -9,7 +9,7 @@
     <h3>Riepilogo Ordine</h3>
     <div>
       <div *ngFor="let prodotto of carrello$ | async" class="prodotto-order">
-        <img [src]="prodotto.immagine_url" 
+  <img [src]="prodotto.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" 
              [alt]="prodotto.nome">
         <div>
           <h4>{{ prodotto.nome }}</h4>
@@ -81,7 +81,8 @@
         <!-- Selezione indirizzo esistente -->
        <div *ngIf="indirizzoSelezionato && !mostraAltriIndirizzi" class="indirizzo-card indirizzo-selezionato">
   <div class="indirizzo-info">
-    <strong>{{ indirizzoSelezionato.destinatario }}</strong><br>
+    <strong>{{ indirizzoSelezionato.destinatario }}</strong>
+    <span *ngIf="indirizzoSelezionato.predefinito" class="badge-predefinito">Predefinito</span><br>
     {{ indirizzoSelezionato.indirizzo }}<br>
     {{ indirizzoSelezionato.citta }}, {{ indirizzoSelezionato.cap }}, {{indirizzoSelezionato.paese}}({{ indirizzoSelezionato.provincia }})<br>
     <small>Tel: {{ indirizzoSelezionato.telefono }}</small>
@@ -89,6 +90,13 @@
           <div class="indirizzo-actions">
             <button type="button" class="btn-modifica" (click)="modificaIndirizzo(indirizzoSelezionato, $event)">Modifica</button>
             <button type="button" class="btn-elimina" (click)="eliminaIndirizzo(indirizzoSelezionato.id, $event)">Elimina</button>
+            <button 
+              type="button" 
+              class="btn-predefinito" 
+              *ngIf="!indirizzoSelezionato.predefinito"
+              (click)="impostaComePredefinito(indirizzoSelezionato, $event)">
+              Imposta come predefinito
+            </button>
           </div>
           
         </div>
@@ -110,7 +118,8 @@
          [class.selected]="indirizzoSelezionato?.id === indirizzo.id"
          (click)="selezionaIndirizzo(indirizzo)">
       <div class="indirizzo-info">
-        <strong>{{ indirizzo.destinatario }}</strong><br>
+        <strong>{{ indirizzo.destinatario }}</strong>
+        <span *ngIf="indirizzo.predefinito" class="badge-predefinito">Predefinito</span><br>
         {{ indirizzo.indirizzo }}<br>
         {{ indirizzo.citta }}, {{ indirizzo.cap }} ({{ indirizzo.provincia }})<br>
         <small>Tel: {{ indirizzo.telefono }}</small>
@@ -118,6 +127,13 @@
       <div class="indirizzo-actions">
         <button type="button" class="btn-modifica" (click)="modificaIndirizzo(indirizzo, $event)">Modifica</button>
         <button type="button" class="btn-elimina" (click)="eliminaIndirizzo(indirizzo.id, $event)">Elimina</button>
+        <button 
+          type="button" 
+          class="btn-predefinito" 
+          *ngIf="!indirizzo.predefinito"
+          (click)="impostaComePredefinito(indirizzo, $event)">
+          Predefinito
+        </button>
       </div>
     </div>
   </div>

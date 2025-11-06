@@ -17,16 +17,16 @@
       <h3>← Torna ai Prodotti</h3>
       <p>Clicca per tornare alla lista</p>
     </div>
-    <div *ngIf="arrivoDaHome" class="back-card-dettaglio" (click)="tornaAllaHome()">
+    <div *ngIf="arrivoDaHome" class="categoria-card" (click)="tornaAllaHome()">
       <h3>← Torna alla Home</h3>
       <p>Clicca per tornare alla pagina principale</p>
     </div>
     <div class="dettaglio-card">
-   <img [src]="prodottoSelezionato?.immagine_url || 'http://localhost:3000/api/images/prodotti/default.jpg'" 
+  <img [src]="prodottoSelezionato?.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" 
      [alt]="prodottoSelezionato?.nome"
      class="prodotto-immagine-dettaglio">
       <p><strong>Marchio:</strong> {{ prodottoSelezionato?.marchio || 'Non specificato' }}</p>
-      <p><strong>Prezzo:</strong> €{{ prodottoSelezionato?.prezzo }}</p>
+  <p><strong>Prezzo:</strong> €{{ (prodottoSelezionato?.prezzo_scontato != null) ? prodottoSelezionato?.prezzo_scontato : prodottoSelezionato?.prezzo }}</p>
       <p><strong>Descrizione:</strong> {{ prodottoSelezionato?.descrizione || 'Descrizione non disponibile' }}</p>
   <p><strong>Disponibilità:</strong> {{ prodottoSelezionato?.quantita_disponibile }} pezzi</p>
       <!-- PULSANTE CARRELLO NEL DETTAGLIO -->
@@ -34,9 +34,10 @@
               [disabled]="prodottoSelezionato?.quantita_disponibile <= 0">
         {{ prodottoSelezionato?.quantita_disponibile > 0 ? 'Aggiungi al carrello' : 'Non disponibile' }}
       </button>
-      <button class="wishlist-btn" (click)="aggiungiAWishlist(prodottoSelezionato)">
+      <!-- PULSANTE WISHLIST NEL DETTAGLIO -->
+      <button class="wishlist-btn" (click)="aggiungiAWishlist(prodottoSelezionato)" title="Aggiungi alla wishlist">
         <span class="cuore">&#10084;</span>
-        </button>
+      </button>
     </div>
   </div>
   <!-- Vista Prodotti -->
@@ -59,7 +60,7 @@
     <div class="prodotti-grid">
       <div class="categoria-card_prodotto" *ngFor="let prodotto of prodottiFiltrati">
         <div (click)="selezionaProdotto(prodotto)">
-          <img [src]="prodotto.immagine_url || 'http://localhost:3000/api/images/prodotti/default.jpg'" 
+          <img [src]="prodotto.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" 
                [alt]="prodotto.nome"
                class="prodotto-immagine">
           <h3>{{ prodotto.nome }}</h3>
