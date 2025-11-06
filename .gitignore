@@ -33,6 +33,14 @@ tmp/
 temp/
 *.tsbuildinfo
 
+# -------- Java / Gradle --------
+BackendJava/build/
+BackendJava/.gradle/
+BackendJava/out/
+*.class
+*.jar
+!gradle-wrapper.jar
+
 # -------- Test / coverage --------
 coverage/
 *.lcov

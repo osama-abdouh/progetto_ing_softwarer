@@ -47,6 +47,8 @@ export class Checkout implements OnInit {
     provincia: '',
     telefono: ''
   };
+  // Flag per capire se stiamo modificando un indirizzo esistente
+  private indirizzoInModificaId: number | null = null;
   
   // Dati del form di pagamento
   datiPagamento: DatiCheckout = {
@@ -123,11 +125,13 @@ export class Checkout implements OnInit {
   mostraNuovoIndirizzo(): void {
     this.mostraFormNuovoIndirizzo = true;
     this.indirizzoSelezionato = null;
+    this.indirizzoInModificaId = null;
   }
 
   annullaNuovoIndirizzo(): void {
     this.mostraFormNuovoIndirizzo = false;
     this.resetNuovoIndirizzo();
+    this.indirizzoInModificaId = null;
   }
 
   validaNuovoIndirizzo(): boolean {
@@ -145,18 +149,58 @@ export class Checkout implements OnInit {
   salvaIndirizzo(): void {
     if (!this.validaNuovoIndirizzo()) return;
 
-    this.userService.addAddress(this.nuovoIndirizzo).subscribe({
-      next: (nuovoIndirizzo: any) => {
-        this.indirizzi.push(nuovoIndirizzo);
-        this.selezionaIndirizzo(nuovoIndirizzo);
-        this.resetNuovoIndirizzo();
-        alert('Indirizzo salvato con successo!');
-      },
-      error: (err: any) => {
-        console.error('Errore salvataggio indirizzo:', err);
-        alert('Errore nel salvataggio dell\'indirizzo');
-      }
-    });
+    // Se è il primo indirizzo, impostalo predefinito
+    const payload = {
+      ...this.nuovoIndirizzo,
+      predefinito: this.indirizzi.length === 0
+    } as any;
+
+    // Se stiamo modificando un indirizzo (abbiamo un id), esegui update, altrimenti create
+    if (this.indirizzoInModificaId != null) {
+      this.userService.updateAddress(this.indirizzoInModificaId, payload).subscribe({
+        next: (indirizzoAggiornato: any) => {
+          // Sostituisce l'elemento nella lista
+          this.indirizzi = this.indirizzi.map(i => i.id === indirizzoAggiornato.id ? indirizzoAggiornato : i);
+          this.selezionaIndirizzo(indirizzoAggiornato);
+          this.resetNuovoIndirizzo();
+          this.indirizzoInModificaId = null;
+          this.mostraFormNuovoIndirizzo = false;
+          alert('Indirizzo aggiornato con successo!');
+        },
+        error: (err: any) => {
+          console.error('Errore aggiornamento indirizzo:', err);
+          const serverMsg = err?.error?.message || err?.error?.messaggio;
+          if (err.status === 400 && serverMsg) {
+            alert(serverMsg);
+          } else if (err.status === 401) {
+            alert('Sessione scaduta. Effettua di nuovo il login.');
+          } else {
+            alert(serverMsg || 'Errore nell\'aggiornamento dell\'indirizzo');
+          }
+        }
+      });
+    } else {
+      this.userService.addAddress(payload).subscribe({
+        next: (nuovoIndirizzo: any) => {
+          this.indirizzi.push(nuovoIndirizzo);
+          this.selezionaIndirizzo(nuovoIndirizzo);
+          this.resetNuovoIndirizzo();
+          this.mostraFormNuovoIndirizzo = false;
+          alert('Indirizzo salvato con successo!');
+        },
+        error: (err: any) => {
+          console.error('Errore salvataggio indirizzo:', err);
+          const serverMsg = err?.error?.message || err?.error?.messaggio;
+          if (err.status === 400 && serverMsg) {
+            alert(serverMsg);
+          } else if (err.status === 401) {
+            alert('Sessione scaduta. Effettua di nuovo il login.');
+          } else {
+            alert(serverMsg || 'Errore nel salvataggio dell\'indirizzo');
+          }
+        }
+      });
+    }
   }
 
   modificaIndirizzo(indirizzo: any, event: Event): void {
@@ -165,6 +209,7 @@ export class Checkout implements OnInit {
     this.nuovoIndirizzo = { ...indirizzo };
     this.mostraFormNuovoIndirizzo = true;
     this.indirizzoSelezionato = null;
+    this.indirizzoInModificaId = indirizzo.id ?? null;
   }
 
   eliminaIndirizzo(indirizzoId: number, event: Event): void {
@@ -176,6 +221,12 @@ export class Checkout implements OnInit {
           if (this.indirizzoSelezionato && this.indirizzoSelezionato.id === indirizzoId) {
           this.indirizzoSelezionato = this.indirizzi.find(i => i.predefinito) || null;
         }
+          // Se stavamo modificando proprio questo indirizzo, resetta form
+          if (this.indirizzoInModificaId === indirizzoId) {
+            this.indirizzoInModificaId = null;
+            this.mostraFormNuovoIndirizzo = false;
+            this.resetNuovoIndirizzo();
+          }
           alert('Indirizzo eliminato con successo!');
         },
         error: (err: any) => {
@@ -184,6 +235,22 @@ export class Checkout implements OnInit {
         }
       });
     }
+  }
+
+  impostaComePredefinito(indirizzo: any, event?: Event): void {
+    if (event) event.stopPropagation();
+    if (!indirizzo || indirizzo.predefinito) return;
+    this.userService.setDefaultAddress(indirizzo.id).subscribe({
+      next: () => {
+        this.indirizzi = this.indirizzi.map(i => ({ ...i, predefinito: i.id === indirizzo.id }));
+        // Mantieni anche la selezione corrente su questo indirizzo
+        this.selezionaIndirizzo(this.indirizzi.find(i => i.id === indirizzo.id));
+      },
+      error: (err: any) => {
+        console.error('Errore impostazione predefinito:', err);
+        alert('Non è stato possibile impostare l\'indirizzo come predefinito');
+      }
+    });
   }
 
   haIndirizzoSelezionato(): boolean {

@@ -42,6 +42,7 @@
       </a>
       <a routerLink="/wishlist" class="nav-icon" title="Wishlist">
         <i class="fa-solid fa-heart"></i>
+        <span *ngIf="wishlistCount > 0" class="cart-badge">{{ wishlistCount }}</span>
       </a>
     </div>
   </nav>

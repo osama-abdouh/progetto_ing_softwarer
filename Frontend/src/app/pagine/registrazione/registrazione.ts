@@ -73,7 +73,7 @@ ngOnInit() {
 
   onSubmit() {
     if (this.registerForm.valid) {
-    this.http.post('http://localhost:3000/api/auth/register', this.registerForm.value)
+  this.http.post('http://localhost:8080/api/auth/register', this.registerForm.value)
       .subscribe({
         next: res => {
           alert('Registrazione avvenuta con successo!');

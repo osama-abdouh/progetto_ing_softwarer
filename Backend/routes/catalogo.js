@@ -99,21 +99,21 @@ router.get('/prodotti/categoria/:nome', async (req, res) => {   //Riceve il nome
 // Prodotti più acquistati (top 3) — aggrega la tabella `acquisti`
 router.get('/popular', async (req, res) => {
   try {
-    // prende i prodotti più acquistati (somma delle quantità)
+    // Aggrega i prodotti più acquistati dalle righe d'ordine
     const result = await pool.query(`
-  SELECT 
-    p.id_prodotto, 
-    p.nome, 
-  CASE WHEN p.promo = TRUE AND p.prezzo_scontato IS NOT NULL THEN p.prezzo_scontato ELSE p.prezzo END AS prezzo,
-  p.prezzo_scontato,
+      SELECT 
+        p.id_prodotto, 
+        p.nome, 
+        CASE WHEN p.promo = TRUE AND p.prezzo_scontato IS NOT NULL THEN p.prezzo_scontato ELSE p.prezzo END AS prezzo,
+        p.prezzo_scontato,
         p.descrizione, 
         p.immagine, 
         p.quantita_disponibile,
-        COALESCE(SUM(a.quantita), 0) AS total_purchased
+        COALESCE(SUM(op.quantita), 0) AS total_purchased
       FROM prodotto p
-      LEFT JOIN acquisti a ON p.id_prodotto = a.id_prodotto
+      LEFT JOIN ordine_prodotti op ON op.prodotto_id = p.id_prodotto
       WHERE p.quantita_disponibile > 0 AND p.bloccato = false
-      GROUP BY p.id_prodotto, p.nome, p.prezzo, p.descrizione, p.immagine, p.quantita_disponibile
+      GROUP BY p.id_prodotto, p.nome, p.prezzo, p.prezzo_scontato, p.promo, p.descrizione, p.immagine, p.quantita_disponibile
       ORDER BY total_purchased DESC, p.nome
       LIMIT 3
     `);

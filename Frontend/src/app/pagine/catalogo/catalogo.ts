@@ -19,6 +19,7 @@ export class Catalogo {
   categorie: any[] = [];
   prodotti: any[] = [];
   prodottoSelezionato: any = null;
+  private handledByPathId: boolean = false;
   
   // Gestione stati, variabili booleane per gestire quale sezione mostrare nella pagina.
   mostraCategorie: boolean = true;
@@ -34,14 +35,30 @@ export class Catalogo {
   isSearchMode: boolean = false;
   
   constructor(private http: HttpClient, private carrelloService: CarrelloService, private route: ActivatedRoute, private router: Router, private catalogoService: CatalogoService, private suggestedService: SuggestedService) {
+    // Gestione path param: /catalogo/prodotto/:id
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        this.handledByPathId = true;
+        this.arrivoDaHome = true;
+        const numId = isNaN(Number(id)) ? id : Number(id);
+        this.caricaProdottoDettaglio(numId as any);
+      }
+    });
+    // Gestione query param (fallback legacy): /catalogo?prodottoId=ID
     this.route.queryParams.subscribe(params => { //params è un oggetto che contiene i parametri della query string (dopo il "?" es. ?prodottoId=42 diventa params['prodottoId'] = 42)
+      if (this.handledByPathId) {
+        return; // già gestito da path param
+      }
       if (params['search']) { //se dentro params cè un parametro chiamato "search" (compare quando usi barra di ricerca)
         this.searchQuery = params['search'];
         this.isSearchMode = true;
         this.eseguiRicerca(params['search']); // fa una richiesta al backend per trovare i prodotti che corrispondono alla ricerca e li mostra nella pagina.
       } else if (params['prodottoId']) {
         this.arrivoDaHome = true;
-        this.caricaProdottoDettaglio(params['prodottoId']);
+        const id = params['prodottoId'];
+        const numId = isNaN(Number(id)) ? id : Number(id);
+        this.caricaProdottoDettaglio(numId as any);
       } else {
         // Reset completo dello stato quando non ci sono parametri
         this.resetStato();
@@ -50,29 +67,35 @@ export class Catalogo {
       }
     });
   }
-  caricaProdottoDettaglio(id: number) { //da barra di ricerca entra dentro i prodotti
-    // Richiedi direttamente il prodotto dal backend per garantire che il dettaglio venga mostrato
-    this.http.get<any>(`http://localhost:3000/api/catalogo/prodotto/${id}`).subscribe(
-      prodotto => {
-        if (prodotto) {
-      
-          this.prodottoSelezionato = prodotto;
-          this.mostraCategorie = false;
-          this.mostraProdotti = false;
-          this.mostraDettaglio = true;
-          this.suggestedService.salvaVisualizzazione(id).subscribe({
-          next: () => {},
-          error: (err) => console.error('Errore salvataggio visualizzazione:', err)
-        });
-        } else {
-          this.caricaCategorie();
-        }
-      },
-      err => {
+  caricaProdottoDettaglio(id: number | string) { //da barra di ricerca entra dentro i prodotti
+    console.debug('Carico dettaglio prodotto ID:', id);
+    const url = `http://localhost:8080/api/catalogo/prodotto/${id}`;
+    this.http.get<any>(url).subscribe({
+      next: (prodotto) => this.visualizzaDettaglio(prodotto, id),
+      error: (err) => {
         console.error('Errore caricamento prodotto:', err);
+        alert('Impossibile caricare il dettaglio del prodotto selezionato.');
         this.caricaCategorie();
       }
-    );
+    });
+  }
+
+  private visualizzaDettaglio(prodotto: any, id: number | string) {
+    if (prodotto) {
+      this.prodottoSelezionato = prodotto;
+      this.mostraCategorie = false;
+      this.mostraProdotti = false;
+      this.mostraDettaglio = true;
+      
+      // Salva visualizzazione (il service controlla se l'utente è loggato)
+      this.suggestedService.salvaVisualizzazione(Number(id)).subscribe({
+        next: () => {},
+        error: (err) => console.error('Errore salvataggio visualizzazione:', err)
+      });
+    } else {
+      console.warn('Prodotto non trovato per ID:', id);
+      this.caricaCategorie();
+    }
   }
   
   aggiungiAWishlist(prodotto: any): void {
@@ -84,7 +107,7 @@ export class Catalogo {
 //carica le categorie dal backend
   caricaCategorie() {
     this.caricamento = true;  //footer flash
-    this.http.get<any[]>('http://localhost:3000/api/catalogo/prodotti').subscribe(
+  this.http.get<any[]>('http://localhost:8080/api/catalogo/prodotti').subscribe(
       dati => { 
         this.categorie = dati; //quando arrivano i dati li salva in this.categorie
         this.caricamento = false;
@@ -107,7 +130,7 @@ export class Catalogo {
   //carica tutti i prodotti appartenenti ad una categoria specifica (usa una get al backend)
   caricaProdottiCategoria(categoria: string) {  
     this.caricamento = true; //bug fix per caricamento footer flash
-    this.http.get<any[]>(`http://localhost:3000/api/catalogo/prodotti/categoria/${categoria}`).subscribe(
+  this.http.get<any[]>(`http://localhost:8080/api/catalogo/prodotti/categoria/${categoria}`).subscribe(
       dati => {
         this.prodotti = dati; //Salva nell’array prodotti tutti i prodotti restituiti dal backend per quella categoria.
         // Estrai marche disponibili dai prodotti
@@ -130,9 +153,9 @@ export class Catalogo {
     this.mostraDettaglio = false;
     this.categoriaSelezionata = `Risultati per: "${query}"`;
 
-    // Usa il nuovo endpoint di ricerca prodotti
-    this.http.get<any[]>(`http://localhost:3000/api/catalogo/prodotti/ricerca?q=${encodeURIComponent(query)}`).subscribe( //encodeURIComponent(query): serve per avere url sicuri (es. non avere spazi)
-      //Salva nell’array prodotti tutti i prodotti restituiti dalla ricerca (quelli che corrispondono alla query).
+    // Usa il backend Java per la ricerca prodotti
+  this.http.get<any[]>(`http://localhost:8080/api/catalogo/prodotti/ricerca?q=${encodeURIComponent(query)}`).subscribe( //encodeURIComponent(query): serve per avere url sicuri (es. non avere spazi)
+      //Salva nell'array prodotti tutti i prodotti restituiti dalla ricerca (quelli che corrispondono alla query).
       prodotti => {  
         this.prodotti = prodotti;
         // Estrai marche disponibili dai risultati

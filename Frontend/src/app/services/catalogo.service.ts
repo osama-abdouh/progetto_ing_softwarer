@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
+import { WishListService } from './wishlist.service';
+import { JAVA_API } from '../config/api.config';
 @Injectable({ providedIn: 'root' })
 export class CatalogoService {
-  private apiUrl = 'http://localhost:3000/api/catalogo';
+  private apiUrl = `${JAVA_API}/catalogo`;
 
-  constructor(private http: HttpClient, private authService: AuthService) {}
+  constructor(private http: HttpClient, private authService: AuthService, private wishlistService: WishListService) {}
 
   // Ottieni prodotti più acquistati (per la home)
   getProdottiPopular(): Observable<any[]> {
@@ -54,12 +56,12 @@ private getIdUtente(): number | null {
     alert('Devi essere autenticato per aggiungere alla wishlist!');
     return;
   }
-  this.http.post('http://localhost:3000/api/wishlist', {
-    user_id: idUtente,
+  this.http.post(`${JAVA_API}/wishlist`, {
     prodotto_id: prodotto.id_prodotto
   }).subscribe({
     next: () => {
       alert('Prodotto aggiunto alla wishlist!');
+      this.wishlistService.refreshCount();
     },
     error: (err) => {
       console.error('Errore wishlist:', err);

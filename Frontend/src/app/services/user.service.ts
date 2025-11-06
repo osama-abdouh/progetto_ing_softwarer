@@ -5,8 +5,8 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class UserService {
   constructor(private http: HttpClient) {}
-  private apiUrl = 'http://localhost:3000/api';
-  private adminApiUrl = 'http://localhost:3000/api/admin';
+  private apiUrl = 'http://localhost:8080/api';
+  private adminApiUrl = 'http://localhost:8080/api/admin';
 
   getUsers() {
     return this.http.get<any[]>(`${this.adminApiUrl}/users`);
@@ -66,7 +66,7 @@ export class UserService {
 }
 
 changeEmail(emailData: any): Observable<any> {
-  return this.http.put<any>(`http://localhost:3000/api/profile/email`, emailData);
+  return this.http.put<any>(`${this.apiUrl}/profile/email`, emailData);
 }
 
 }

@@ -8,7 +8,7 @@
       <a href="/catalogo">Continua gli acquisti</a>
     </div>
     <div *ngFor="let item of carrelloGuest; trackBy: trackByItem" class="carrello-item">
-      <img [src]="item.immagine_url || 'http://localhost:3000/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
+  <img [src]="item.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
       <div class="item-details">
         <h4 class="carrello-text">{{ item.nome }}</h4>
         <p class="carrello-text">Prezzo: {{ item.prezzo_scontato != null ? item.prezzo_scontato : item.prezzo }}€</p>
@@ -38,7 +38,7 @@
         <a href="/catalogo">Continua gli acquisti</a>
       </div>
       <div *ngFor="let item of carrello; trackBy: trackByItem" class="carrello-item">
-        <img [src]="item.immagine_url || 'http://localhost:3000/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
+  <img [src]="item.immagine_url || 'http://localhost:8080/api/images/prodotti/default.jpg'" [alt]="item.nome" width="100">
         <div class="item-details">
           <h4 class="carrello-text">{{ item.nome }}</h4>
           <p class="carrello-text">Prezzo: {{ item.prezzo_scontato != null ? item.prezzo_scontato : item.prezzo }}€</p>

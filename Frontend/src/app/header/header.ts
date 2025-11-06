@@ -119,10 +119,8 @@ export class Header {
     this.searchQuery = '';
     this.showSuggestions = false;
     this.showSearchOverlay = false;
-    // Naviga alla pagina del prodotto specifico
-    this.router.navigate(['/catalogo'], { 
-      queryParams: { prodottoId: product.id_prodotto } 
-    });
+    // Naviga alla pagina del prodotto specifico (route dedicata)
+    this.router.navigate(['/catalogo/prodotto', product.id_prodotto]);
   }
 
   searchProducts() {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { JAVA_API } from '../config/api.config';
 
 export interface Pacchetto { //indica quali "proprietà" ha in questo caso un pacchetto
   nome: string;
@@ -20,7 +21,7 @@ export interface PacchettoDettaglio { //ha sia pacchetto come quello sopra più 
   providedIn: 'root' 
 })
 export class PacchettiService {
-  private apiUrl = 'http://localhost:3000/api/pacchetti';
+  private apiUrl = `${JAVA_API}/pacchetti`;
 
   constructor(private http: HttpClient) {}
 

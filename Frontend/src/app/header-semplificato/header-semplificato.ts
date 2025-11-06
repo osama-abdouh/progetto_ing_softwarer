@@ -7,6 +7,7 @@ import { CatalogoService } from '../services/catalogo.service';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { CarrelloService } from '../services/carrello.service';
+import { WishListService } from '../services/wishlist.service';
 
 
 @Component({
@@ -24,12 +25,14 @@ export class HeaderSemplificato {
   showSearchOverlay = false;
   showSignInMenu = false;
   carrelloCount = 0;  
+  wishlistCount = 0;
 
 
   private searchSubject = new Subject<string>();
 
   constructor(
-    private carrelloService: CarrelloService,
+  private carrelloService: CarrelloService,
+  private wishlistService: WishListService,
     public auth: AuthService,
     private router: Router,
     private catalogoService: CatalogoService
@@ -38,6 +41,7 @@ export class HeaderSemplificato {
      this.carrelloService.carrello$.subscribe(carrello => {
     this.carrelloCount = carrello.reduce((totale, prodotto) => totale + (prodotto.quantita || 1), 0);
   });
+     this.wishlistService.wishlistCount$.subscribe(count => this.wishlistCount = count);
 
     this.user = this.auth.getUser();
 
@@ -59,7 +63,12 @@ export class HeaderSemplificato {
     });
   }
 
-  ngOnInit() { this.auth.user$.subscribe(u => this.user = u); }
+  ngOnInit() { 
+    this.auth.user$.subscribe(u => {
+      this.user = u; 
+      if (u) this.wishlistService.refreshCount(); else this.wishlistService.refreshCount();
+    });
+  }
 
   logout() { this.auth.logout(); }
 
@@ -91,7 +100,7 @@ export class HeaderSemplificato {
       }
     }
 
-  selectSuggestion(product: any) { this.searchQuery = ''; this.showSuggestions = false; this.showSearchOverlay = false; this.router.navigate(['/catalogo'], { queryParams: { prodottoId: product.id_prodotto } }); }
+  selectSuggestion(product: any) { this.searchQuery = ''; this.showSuggestions = false; this.showSearchOverlay = false; this.router.navigate(['/catalogo/prodotto', product.id_prodotto]); }
 
   searchProducts() { if (this.searchQuery.trim()) { this.router.navigate(['/catalogo'], { queryParams: { search: this.searchQuery.trim() } }); this.searchQuery = ''; this.showSuggestions = false; this.showSearchOverlay = false; } }
 
