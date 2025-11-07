@@ -1,14 +1,14 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
-import { Header } from './header/header';
+import { HeaderSemplificato } from './header-semplificato/header-semplificato';
 import { Footer } from './footer/footer';
 
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, Footer, Header],
+  imports: [RouterOutlet, Footer, HeaderSemplificato],
   templateUrl: './app.html',
   styleUrls: ['./app.css']
 })
