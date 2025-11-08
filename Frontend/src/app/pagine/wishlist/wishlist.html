@@ -4,7 +4,7 @@
   </div>
   <div *ngFor="let prodotto of wishlist" class="wishlist-row">
     <div class="wishlist-img">
-      <img [src]="'http://localhost:3000/uploads/prodotti/' + prodotto.immagine" alt="{{ prodotto.nome }}" (click)= "mostraProdotto(prodotto.id)">
+      <img [src]="'http://localhost:8080/api/immagine/uploads/prodotti/' + prodotto.immagine" alt="{{ prodotto.nome }}" (click)= "mostraProdotto(prodotto.id)">
     </div>
     
     <div class="wishlist-info">

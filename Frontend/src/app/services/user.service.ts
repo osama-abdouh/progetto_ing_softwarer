@@ -34,20 +34,40 @@ export class UserService {
 
   // Indirizzi
   getAddresses(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/indirizzi`);
-  }
-
-  addAddress(addressData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/indirizzi`, addressData);
-  }
-
-  updateAddress(id: number, addressData: any): Observable<any> {
-  return this.http.put<any>(`${this.apiUrl}/indirizzi/${id}`, addressData);
+  const token = localStorage.getItem('jwt');
+  return this.http.get<any[]>(`${this.apiUrl}/indirizzi`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 }
 
-  deleteAddress(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/indirizzi/${id}`);
-  }
+addAddress(addressData: any): Observable<any> {
+  const token = localStorage.getItem('jwt');
+  return this.http.post<any>(`${this.apiUrl}/indirizzi`, addressData, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+updateAddress(id: number, addressData: any): Observable<any> {
+  const token = localStorage.getItem('jwt');
+  return this.http.put<any>(`${this.apiUrl}/indirizzi/${id}`, addressData, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+deleteAddress(id: number): Observable<any> {
+  const token = localStorage.getItem('jwt');
+  return this.http.delete<any>(`${this.apiUrl}/indirizzi/${id}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
+setDefaultAddress(id: number): Observable<any> {
+  const token = localStorage.getItem('jwt');
+  return this.http.put<any>(`${this.apiUrl}/indirizzi/${id}/predefinito`, {}, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+}
+
 
   // Wishlist
   getWishlist(): Observable<any[]> {
@@ -61,9 +81,6 @@ export class UserService {
   removeFromWishlist(prodottoId: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/wishlist/${prodottoId}`);
   }
-  setDefaultAddress(id: number): Observable<any> {
-  return this.http.put<any>(`${this.apiUrl}/indirizzi/${id}/predefinito`, {});
-}
 
 changeEmail(emailData: any): Observable<any> {
   return this.http.put<any>(`${this.apiUrl}/profile/email`, emailData);
